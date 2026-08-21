@@ -21,7 +21,7 @@ public class NbtViewer implements ModInitializer {
 		// However, some things (like resources) may still be uninitialized.
 		// Proceed with mild caution.
 
-		LOGGER.info("Hello Fabric world!");
+		LOGGER.info("[NBT-Viewer]喵喵喵");
 	}
 
 	public static Identifier id(String path) {

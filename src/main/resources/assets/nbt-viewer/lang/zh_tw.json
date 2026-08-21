@@ -1,1 +1,12 @@
-{"key.nbt-viewer.show_nbt":"顯示 NBT","category.nbt-viewer":"NBT 查看器","tooltip.nbt-viewer.show_nbt":"按下 %s 顯示物品 NBT","screen.nbt-viewer.entity":"實體 NBT","gui.nbt-viewer.copy":"複製 NBT","gui.done":"完成","config.nbt-viewer.title":"NBT 查看器設定","config.nbt-viewer.category.general":"一般","config.nbt-viewer.show_tooltip":"顯示物品提示","config.nbt-viewer.show_tooltip.description":"在物品提示中顯示 NBT 快捷鍵提示。"}
+{
+    "key.nbt-viewer.show_nbt": "顯示 NBT",
+    "category.nbt-viewer": "NBT 查看器",
+    "tooltip.nbt-viewer.show_nbt": "按下 %s 顯示物品 NBT",
+    "screen.nbt-viewer.entity": "實體 NBT",
+    "gui.nbt-viewer.copy": "複製 NBT",
+    "gui.done": "完成",
+    "config.nbt-viewer.title": "NBT 查看器設定",
+    "config.nbt-viewer.category.general": "一般",
+    "config.nbt-viewer.show_tooltip": "顯示物品提示",
+    "config.nbt-viewer.show_tooltip.description": "在物品提示中顯示 NBT 快捷鍵提示。"
+}
