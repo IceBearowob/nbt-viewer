@@ -2,6 +2,8 @@ package ice.nbtviewer.client.mixin;
 
 import ice.nbtviewer.client.gui.NbtScreen;
 import ice.nbtviewer.client.util.NbtCapture;
+import ice.nbtviewer.client.NbtViewerConfig;
+import ice.nbtviewer.client.NbtViewerClient;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.client.input.KeyEvent;
@@ -19,7 +21,12 @@ public abstract class AbstractContainerScreenMixin {
     @Shadow protected Slot hoveredSlot;
     @Inject(method = "keyPressed", at = @At("HEAD"), cancellable = true)
     private void nbtViewer$showItemNbt(KeyEvent event, CallbackInfoReturnable<Boolean> cir) {
-        if (event.key() != 78 || hoveredSlot == null || hoveredSlot.getItem().isEmpty()) return;
+        if (!NbtViewerConfig.enabled()) {
+            return;
+        }
+        if (!NbtViewerClient.showNbt.matches(event) || hoveredSlot == null || hoveredSlot.getItem().isEmpty()) {
+            return;
+        }
         ItemStack stack = hoveredSlot.getItem();
         CompoundTag tag = NbtCapture.captureItem(Minecraft.getInstance(), stack);
         Minecraft.getInstance().execute(() -> Minecraft.getInstance().gui.setScreen(

@@ -25,6 +25,7 @@ public class NbtViewerClient implements ClientModInitializer {
 		));
 
 		ClientTickEvents.END_CLIENT_TICK.register(client -> {
+			if (!NbtViewerConfig.enabled()) return;
 			while (showNbt.consumeClick() && client.gui.screen() == null) {
 				NbtCapture.captureLookingAt(client).ifPresent(nbt ->
 					client.setScreenAndShow(new NbtScreen(
@@ -35,7 +36,7 @@ public class NbtViewerClient implements ClientModInitializer {
 		});
 
 		ItemTooltipCallback.EVENT.register((stack, context, type, lines) -> {
-			if (NbtViewerConfig.showItemTooltip()) {
+			if (NbtViewerConfig.enabled() && NbtViewerConfig.showItemTooltip()) {
 				lines.add(Component.translatable(
 					"tooltip.nbt-viewer.show_nbt",
 					showNbt.getTranslatedKeyMessage()

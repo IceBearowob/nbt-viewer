@@ -7,6 +7,8 @@
     "gui.done": "完成",
     "config.nbt-viewer.title": "NBT 查看器設定",
     "config.nbt-viewer.category.general": "一般",
+    "config.nbt-viewer.enabled": "啟用 NBT 查看器",
+    "config.nbt-viewer.enabled.description": "關閉後，快捷鍵與物品 NBT 提示都不會運作。",
     "config.nbt-viewer.show_tooltip": "顯示物品提示",
     "config.nbt-viewer.show_tooltip.description": "在物品提示中顯示 NBT 快捷鍵提示。"
 }

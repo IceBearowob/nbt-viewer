@@ -21,7 +21,13 @@ public final class ModMenuIntegration implements ModMenuApi {
     }
 
     private static ConfigCategory createGeneralCategory() {
-        // The no-argument builder is the non-deprecated YACL 3.9.6 API.
+        var enabled = Option.<Boolean>createBuilder()
+            .name(Component.translatable("config.nbt-viewer.enabled"))
+            .description(OptionDescription.of(Component.translatable("config.nbt-viewer.enabled.description")))
+            .binding(true, NbtViewerConfig::enabled, NbtViewerConfig::setEnabled)
+            .controller(BooleanControllerBuilder::create)
+            .build();
+
         var showTooltip = Option.<Boolean>createBuilder()
             .name(Component.translatable("config.nbt-viewer.show_tooltip"))
             .description(OptionDescription.of(
@@ -32,6 +38,7 @@ public final class ModMenuIntegration implements ModMenuApi {
 
         return ConfigCategory.createBuilder()
             .name(Component.translatable("config.nbt-viewer.category.general"))
+            .option(enabled)
             .option(showTooltip)
             .build();
     }
