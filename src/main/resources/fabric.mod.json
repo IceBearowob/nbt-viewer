@@ -2,15 +2,15 @@
 	"schemaVersion": 1,
 	"id": "nbt-viewer",
 	"version": "${version}",
-	"name": "nbt-viewer",
+	"name": "NBT Viewer",
 	"description": "查看物品或實體的NBT小工具",
 	"authors": [
-		"Me!"
+		"Ice//2026"
 	],
 	"contact": {
 		"sources": "https://github.com/IceBearowob/nbt-viewer"
 	},
-	"license": "CC0-1.0",
+	"license": "unlicense",
 	"icon": "assets/nbt-viewer/icon.png",
 	"environment": "*",
 	"entrypoints": {
