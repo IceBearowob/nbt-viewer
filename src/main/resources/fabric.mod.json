@@ -18,16 +18,11 @@
 		"main": [
 			"ice.nbtviewer.NbtViewer"
 		],
-		"client": [
-			"ice.nbtviewer.client.NbtViewerClient"
-		]
+		"client": ["ice.nbtviewer.client.NbtViewerClient"],
+		"modmenu": ["ice.nbtviewer.client.ModMenuIntegration"]
 	},
 	"mixins": [
-		"nbt-viewer.mixins.json",
-		{
-			"config": "nbt-viewer.client.mixins.json",
-			"environment": "client"
-		}
+		{"config": "nbt-viewer.client.mixins.json", "environment": "client"}
 	],
 	"depends": {
 		"fabricloader": ">=0.19.3",

@@ -1,14 +1,8 @@
 {
-	"required": true,
-	"package": "ice.nbtviewer.client.mixin",
-	"compatibilityLevel": "JAVA_25",
-	"client": [
-		"ExampleClientMixin"
-	],
-	"injectors": {
-		"defaultRequire": 1
-	},
-	"overwrites": {
-		"requireAnnotations": true
-	}
+  "required": true,
+  "minVersion": "0.8",
+  "package": "ice.nbtviewer.client.mixin",
+  "compatibilityLevel": "JAVA_25",
+  "client": ["AbstractContainerScreenMixin"],
+  "injectors": {"defaultRequire": 1}
 }
