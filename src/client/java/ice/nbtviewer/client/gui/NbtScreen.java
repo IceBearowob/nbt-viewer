@@ -3,6 +3,8 @@ package ice.nbtviewer.client.gui;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.input.KeyEvent;
+import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 
@@ -11,6 +13,9 @@ public final class NbtScreen extends Screen {
     private final String formatted;
     private final String compact;
     private int scroll;
+    private boolean draggingScrollbar, selecting;
+    private double scrollbarDragOffset;
+    private int selectionStart = -1, selectionEnd = -1;
 
     public NbtScreen(Component title, CompoundTag nbt) {
         super(title);
@@ -47,6 +52,67 @@ public final class NbtScreen extends Screen {
         result.append("  ".repeat(depth));
     }
 
+    private int panelHeight() {
+        return Math.min(480, height - 90);
+    }
+
+    private String[] lines() {
+        return formatted.split("\\n", -1);
+    }
+
+    private int maximumScroll() {
+        return Math.max(0, lines().length * font.lineHeight - panelHeight() + 16);
+    }
+    private String selectedText() {
+        int from = Math.min(selectionStart, selectionEnd);
+        int to = Math.max(selectionStart, selectionEnd);
+        return from >= 0 && to > from ? formatted.substring(from, to) : "";
+    }
+    private int characterAt(double mouseX, double mouseY) {
+        int panelWidth = Math.min(760, width - 40), left = (width - panelWidth) / 2;
+        int line = (int) ((mouseY - 35 - 8 + scroll) / font.lineHeight);
+        String[] all = lines();
+        if (line < 0 || line >= all.length) return -1;
+
+        String value = all[line];
+        int x = (int) mouseX - left - 12;
+        int index = 0;
+        while (index < value.length() && font.width(value.substring(0, index + 1)) < x) {
+            index++;
+        }
+
+        int absolute = 0;
+        for (int i = 0; i < line; i++) {
+            absolute += all[i].length() + 1;
+        }
+        return absolute + index;
+    }
+
+    private void updateScrollbar(double mouseY) {
+        int top = 35;
+        int height = panelHeight();
+        int content = lines().length * font.lineHeight;
+        int thumb = Math.max(24, height * height / Math.max(height, content));
+        int travel = height - thumb;
+        double fraction = travel == 0
+            ? 0
+            : Math.max(0, Math.min(1, (mouseY - top - scrollbarDragOffset) / travel));
+        scroll = (int) (maximumScroll() * fraction);
+    }
+
+    private int scrollbarThumbTop() {
+        int content = lines().length * font.lineHeight;
+        int thumb = Math.max(24, panelHeight() * panelHeight() / Math.max(panelHeight(), content));
+        return 35 + (maximumScroll() == 0
+            ? 0
+            : (panelHeight() - thumb) * scroll / maximumScroll());
+    }
+
+    private int scrollbarThumbHeight() {
+        int content = lines().length * font.lineHeight;
+        return Math.max(24, panelHeight() * panelHeight() / Math.max(panelHeight(), content));
+    }
+
     @Override
     protected void init() {
         int panelWidth = Math.min(760, width - 40);
@@ -75,21 +141,104 @@ public final class NbtScreen extends Screen {
         graphics.enableScissor(left, top, left + panelWidth, top + panelHeight);
 
         int lineY = top + 8 - scroll;
-        for (String line : formatted.split("\\n", -1)) {
+        int offset = 0;
+        for (String line : lines()) {
+            if (selectionStart >= 0 && selectionStart != selectionEnd) {
+                int start = Math.min(selectionStart, selectionEnd), end = Math.max(selectionStart, selectionEnd);
+                int from = Math.max(start, offset) - offset, to = Math.min(end, offset + line.length()) - offset;
+                if (from < to) graphics.fill(left + 12 + font.width(line.substring(0, from)), lineY - 1, left + 12 + font.width(line.substring(0, to)), lineY + font.lineHeight, 0xFF406080);
+            }
             graphics.text(font, line, left + 12, lineY, 0xFFE0E0E0, false);
             lineY += font.lineHeight;
+            offset += line.length() + 1;
         }
 
         graphics.disableScissor();
+        int content = lines().length * font.lineHeight, thumb = Math.max(24, panelHeight * panelHeight / Math.max(panelHeight, content));
+        int thumbTop = scrollbarThumbTop();
+        graphics.fill(left + panelWidth + 4, top, left + panelWidth + 8, top + panelHeight, 0xFF303038);
+        graphics.fill(left + panelWidth + 3, thumbTop, left + panelWidth + 9, thumbTop + thumb, 0xFFAAAAAA);
         super.extractRenderState(graphics, mouseX, mouseY, delta);
     }
 
     @Override
+    public boolean mouseClicked(MouseButtonEvent event, boolean doubleClick) {
+        double x = event.x();
+        double y = event.y();
+        int button = event.button();
+        int panelWidth = Math.min(760, width - 40);
+        int left = (width - panelWidth) / 2;
+        boolean insidePanel = x >= left && x <= left + panelWidth
+            && y >= 35 && y <= 35 + panelHeight();
+        boolean insideScrollbar = x >= left + panelWidth + 2
+            && x <= left + panelWidth + 12 && y >= 35
+            && y <= 35 + panelHeight();
+
+        int thumbTop = scrollbarThumbTop();
+        int thumbBottom = thumbTop + scrollbarThumbHeight();
+
+        if (button == 0 && insideScrollbar && y >= thumbTop && y <= thumbBottom) {
+            draggingScrollbar = true;
+            scrollbarDragOffset = y - thumbTop;
+            return true;
+        }
+
+        if (button == 0 && insidePanel) {
+            int position = characterAt(x, y);
+            if (position >= 0) {
+                selecting = true;
+                selectionStart = position;
+                selectionEnd = position;
+                return true;
+            }
+        }
+
+        if (button == 1 && selectionStart >= 0 && selectionStart != selectionEnd) {
+            minecraft.keyboardHandler.setClipboard(selectedText());
+            return true;
+        }
+
+        return super.mouseClicked(event, doubleClick);
+    }
+
+    @Override
+    public boolean mouseDragged(MouseButtonEvent event, double dx, double dy) {
+        double x = event.x();
+        double y = event.y();
+        if (draggingScrollbar) {
+            updateScrollbar(y);
+            return true;
+        }
+        if (selecting) {
+            int position = characterAt(x, y);
+            if (position >= 0) selectionEnd = position;
+            return true;
+        }
+        return super.mouseDragged(event, dx, dy);
+    }
+
+    @Override
+    public boolean mouseReleased(MouseButtonEvent event) {
+        draggingScrollbar = false;
+        selecting = false;
+        return super.mouseReleased(event);
+    }
+
+    @Override
+    public boolean keyPressed(KeyEvent event) {
+        if ((event.modifiers() & 2) != 0
+            && event.key() == 67
+            && selectionStart >= 0
+            && selectionStart != selectionEnd) {
+            minecraft.keyboardHandler.setClipboard(selectedText());
+            return true;
+        }
+        return super.keyPressed(event);
+    }
+
+    @Override
     public boolean mouseScrolled(double mouseX, double mouseY, double horizontal, double vertical) {
-        int panelHeight = Math.min(480, height - 90);
-        int contentHeight = formatted.split("\\n", -1).length * font.lineHeight;
-        int maximumScroll = Math.max(0, contentHeight - panelHeight + 16);
-        scroll = (int) Math.max(0, Math.min(maximumScroll, scroll - vertical * font.lineHeight));
+        scroll = (int) Math.max(0, Math.min(maximumScroll(), scroll - vertical * font.lineHeight));
         return true;
     }
 }
