@@ -1,9 +1,13 @@
 # gradle
 
 .gradle/
+.gradle-home/
+.github/
+gradle/
 build/
 out/
 classes/
+META-INF/
 
 # eclipse
 
