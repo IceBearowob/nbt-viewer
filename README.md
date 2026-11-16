@@ -5,4 +5,4 @@
 必須安裝YetAnotherConfigLib!
 
 ## 如何下載
-在右邊的release下載，模組會永遠保持在最新版本
+在右邊的release下載
