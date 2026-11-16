@@ -7,7 +7,6 @@ import net.minecraft.client.KeyMapping;
 import net.minecraft.network.chat.Component;
 import com.mojang.blaze3d.platform.InputConstants;
 import net.fabricmc.fabric.api.client.item.v1.ItemTooltipCallback;
-import org.lwjgl.glfw.GLFW;
 
 import ice.nbtviewer.client.gui.NbtScreen;
 import ice.nbtviewer.client.util.NbtCapture;
@@ -19,8 +18,8 @@ public class NbtViewerClient implements ClientModInitializer {
 	public void onInitializeClient() {
 		showNbt = KeyMappingHelper.registerKeyMapping(new KeyMapping(
 			"key.nbt-viewer.show_nbt",
-			InputConstants.Type.KEYSYM,
-			GLFW.GLFW_KEY_N,
+			InputConstants.Type.KEYBOARD,
+			InputConstants.KEY_N,
 			KeyMapping.Category.MISC
 		));
 

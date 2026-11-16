@@ -1,5 +1,6 @@
 package ice.nbtviewer.client.gui;
 
+import com.mojang.blaze3d.platform.InputConstants;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.screens.Screen;
@@ -227,7 +228,7 @@ public final class NbtScreen extends Screen {
     @Override
     public boolean keyPressed(KeyEvent event) {
         if ((event.modifiers() & 2) != 0
-            && event.key() == 67
+            && event.key() == InputConstants.KEY_C
             && selectionStart >= 0
             && selectionStart != selectionEnd) {
             minecraft.keyboardHandler.setClipboard(selectedText());
